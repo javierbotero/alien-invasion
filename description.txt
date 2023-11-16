@@ -1,0 +1,8 @@
+The game starts with a fleet of aliens and a
+rocket that can be move left and right
+with the arrow keys, and fires bullets
+with the space bar. When all aliens are destroyed,
+another new and faster fleet will appear.
+If one of the aliens reaches the bottom of the screen,
+or touches the rocket the player loses one ship.
+If all ships are destroyed, the game is over.
