@@ -5,6 +5,7 @@ import pygame
 from settings import Settings
 from ship import Ship
 from bullet import Bullet
+from alien import Alien
 
 class AlienInvasion:
     """A class to represent the Alien Invasion"""
@@ -21,6 +22,8 @@ class AlienInvasion:
         pygame.display.set_caption("Javier's Alien Invasion")
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
+        self.aliens = pygame.sprite.Group()
+        self._create_aliens()
 
     def run_game(self):
         """Runs the game"""
@@ -39,15 +42,14 @@ class AlienInvasion:
                 self._update_keyup(event)
 
     def _update_screen(self):
-         """Update the screen per iteration."""
-         self.screen.fill(self.settings.bg_color)
-         self.ship.update()
-         self.ship.blitme()
-         self.bullets.update()
-         for bullet in self.bullets.sprites():
-             bullet.draw_bullet()
+        """Update the screen per iteration."""
+        self.screen.fill(self.settings.bg_color)
+        self.ship.update()
+        self.ship.blitme()
+        self.aliens.draw(self.screen)
+        self._update_bullets()
 
-         pygame.display.flip()
+        pygame.display.flip()
 
     def _update_keydown(self, event):
         """Updates keydown events."""
@@ -68,8 +70,34 @@ class AlienInvasion:
             self.ship.move_left = False
 
     def _fire_bullet(self):
-        bullet = Bullet(self)
-        self.bullets.add(bullet)
+        """Create a new bullet and add it to the bullets group."""
+        if len(self.bullets) < self.settings.bullets_allowed:
+            bullet = Bullet(self)
+            self.bullets.add(bullet)
+
+    def _update_bullets(self):
+        """Update position of bullets and get rid of old bullets."""
+        self.bullets.update()
+        for bullet in self.bullets.sprites():
+            bullet.draw_bullet()
+
+        for bullet in self.bullets.copy():
+            if bullet.rect.bottom <= 0:
+                self.bullets.remove(bullet)
+        print(f"Bullets: {len(self.bullets)}")
+
+    def _create_aliens(self):
+        """Creates the Alien's fleet"""
+        alien = Alien(self)
+        alien_width = alien.rect.width
+        available_space_x = self.settings.screen_width - (2 * alien_width)
+        number_aliens = available_space_x // (2 * alien_width)
+        for index in range(number_aliens):
+            new_alien = Alien(self)
+            distance = alien_width * 2 * index
+            new_alien.x += distance
+            new_alien.rect.x += new_alien.x
+            self.aliens.add(new_alien)
 
 if __name__ == '__main__':
     ai = AlienInvasion()
