@@ -23,7 +23,7 @@ class AlienInvasion:
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
-        self._create_aliens()
+        self._create_fleet()
 
     def run_game(self):
         """Runs the game"""
@@ -86,18 +86,28 @@ class AlienInvasion:
                 self.bullets.remove(bullet)
         print(f"Bullets: {len(self.bullets)}")
 
-    def _create_aliens(self):
+    def _create_fleet(self):
         """Creates the Alien's fleet"""
         alien = Alien(self)
-        alien_width = alien.rect.width
-        available_space_x = self.settings.screen_width - (2 * alien_width)
-        number_aliens = available_space_x // (2 * alien_width)
-        for index in range(number_aliens):
-            new_alien = Alien(self)
-            distance = alien_width * 2 * index
-            new_alien.x += distance
-            new_alien.rect.x += new_alien.x
-            self.aliens.add(new_alien)
+        width, height = alien.rect.size
+        available_space_x = self.settings.screen_width - (2 * width)
+        number_aliens_x = available_space_x // (2 * width)
+        available_space_y = (self.settings.screen_hight - (height * 3)
+                               - self.ship.rect.height)
+        number_aliens_y = available_space_y // (height * 2)
+
+        for index_y in range(number_aliens_y):
+            for index_x in range(number_aliens_x):
+                self._create_alien(index_x, index_y)
+
+    def _create_alien(self, index_x, index_y):
+        """Create a new alien and add it to the alien group."""
+        alien = Alien(self)
+        width, height = alien.rect.size
+        alien.x += width * 2 * index_x
+        alien.rect.x = alien.x
+        alien.rect.y += height * 2 * index_y
+        self.aliens.add(alien)
 
 if __name__ == '__main__':
     ai = AlienInvasion()
