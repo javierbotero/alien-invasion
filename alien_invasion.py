@@ -46,6 +46,7 @@ class AlienInvasion:
         self.screen.fill(self.settings.bg_color)
         self.ship.update()
         self.ship.blitme()
+        self._update_aliens()
         self.aliens.draw(self.screen)
         self._update_bullets()
 
@@ -76,15 +77,28 @@ class AlienInvasion:
             self.bullets.add(bullet)
 
     def _update_bullets(self):
-        """Update position of bullets and get rid of old bullets."""
+        """Update position of bullets and get rid of old bullets.
+        Delete aliens and bullets too"""
         self.bullets.update()
+
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
 
         for bullet in self.bullets.copy():
             if bullet.rect.bottom <= 0:
                 self.bullets.remove(bullet)
-        print(f"Bullets: {len(self.bullets)}")
+
+        self._check_bullet_alien_collision()
+
+    def _check_bullet_alien_collision(self):
+        """Checks for collision of bullets and aliens"""
+        collisions = pygame.sprite.groupcollide(
+            self.bullets, self.aliens, True, True
+            )
+
+        if not self.aliens:
+            self.bullets.empty()
+            self._create_fleet()
 
     def _create_fleet(self):
         """Creates the Alien's fleet"""
@@ -108,6 +122,25 @@ class AlienInvasion:
         alien.rect.x = alien.x
         alien.rect.y += height * 2 * index_y
         self.aliens.add(alien)
+
+    def _update_aliens(self):
+        """Update the position of aliens."""
+        self._check_fleet_edges()
+        self.aliens.update()
+
+    def _check_fleet_edges(self):
+        """Checks if any aliens have reached an edge."""
+        for alien in self.aliens.sprites():
+            if alien.check_alien_edges():
+                self._change_fleet_direction()
+                break
+
+    def _change_fleet_direction(self):
+        """Changes alien's fleet direction and drops down the aliens"""
+        for alien in self.aliens.sprites():
+            alien.rect.y += self.settings.drop_alien_speed
+
+        self.settings.fleet_direction *= -1
 
 if __name__ == '__main__':
     ai = AlienInvasion()
