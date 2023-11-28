@@ -1,4 +1,5 @@
 import sys
+from time import sleep
 
 import pygame
 
@@ -6,6 +7,7 @@ from settings import Settings
 from ship import Ship
 from bullet import Bullet
 from alien import Alien
+from game_stats import GameStats
 
 class AlienInvasion:
     """A class to represent the Alien Invasion"""
@@ -21,6 +23,7 @@ class AlienInvasion:
         self.settings.screen_hight = self.screen.get_rect().height
         pygame.display.set_caption("Javier's Alien Invasion")
         self.ship = Ship(self)
+        self.stats = GameStats(self)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
         self._create_fleet()
@@ -44,8 +47,7 @@ class AlienInvasion:
     def _update_screen(self):
         """Update the screen per iteration."""
         self.screen.fill(self.settings.bg_color)
-        self.ship.update()
-        self.ship.blitme()
+        self._update_ship()
         self._update_aliens()
         self.aliens.draw(self.screen)
         self._update_bullets()
@@ -113,6 +115,23 @@ class AlienInvasion:
         for index_y in range(number_aliens_y):
             for index_x in range(number_aliens_x):
                 self._create_alien(index_x, index_y)
+
+    def _update_ship(self):
+        """Updates ship and checks collisions"""
+        if pygame.sprite.spritecollideany(self.ship, self.aliens):
+            self._reset_game()
+        else:
+            self.ship.update()
+            self.ship.blitme()
+
+    def _reset_game(self):
+        """resets game"""
+        self.ship.center_ship()
+        self.bullets.empty()
+        self.aliens.empty()
+        self.stats.ships_left -= 1
+        self._create_fleet()
+        sleep(0.5)
 
     def _create_alien(self, index_x, index_y):
         """Create a new alien and add it to the alien group."""

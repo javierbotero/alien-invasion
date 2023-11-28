@@ -26,3 +26,7 @@ class Ship:
             self.x -= self.settings.speed_incrementor
 
         self.rect.x = self.x
+    
+    def center_ship(self):
+        """Centers the ship"""
+        self.rect.midbottom = self.screen_rect.midbottom
