@@ -47,10 +47,11 @@ class AlienInvasion:
     def _update_screen(self):
         """Update the screen per iteration."""
         self.screen.fill(self.settings.bg_color)
-        self._update_ship()
-        self._update_aliens()
-        self.aliens.draw(self.screen)
-        self._update_bullets()
+        if self.stats.game_active:
+            self._update_ship()
+            self._update_aliens()
+            self.aliens.draw(self.screen)
+            self._update_bullets()
 
         pygame.display.flip()
 
@@ -61,7 +62,7 @@ class AlienInvasion:
         elif event.key == pygame.K_LEFT:
             self.ship.move_left = True
         elif event.key == pygame.K_SPACE:
-            self._fire_bullet()
+                self._fire_bullet()
         elif event.key == pygame.K_q:
             sys.exit()
 
@@ -118,8 +119,11 @@ class AlienInvasion:
 
     def _update_ship(self):
         """Updates ship and checks collisions"""
-        if pygame.sprite.spritecollideany(self.ship, self.aliens):
+        if (pygame.sprite.spritecollideany(self.ship, self.aliens)
+            or self._check_aliens_reach_bottom()):
             self._reset_game()
+            if self.stats.ships_left <= 0:
+                self.stats.game_active = False
         else:
             self.ship.update()
             self.ship.blitme()
@@ -160,6 +164,13 @@ class AlienInvasion:
             alien.rect.y += self.settings.drop_alien_speed
 
         self.settings.fleet_direction *= -1
+
+    def _check_aliens_reach_bottom(self):
+        """Checks if any aliens have reached the bottom of the screen"""
+        screen_rect = self.screen.get_rect()
+        for alien in self.aliens.sprites():
+            if alien.rect.bottom >= screen_rect.bottom:
+                return True
 
 if __name__ == '__main__':
     ai = AlienInvasion()
