@@ -62,6 +62,9 @@ class AlienInvasion:
             self.bullets.empty()
             self._create_fleet()
 
+            # hides cursor
+            pygame.mouse.set_visible(False)
+
     def _update_screen(self):
         """Update the screen per iteration."""
         self.screen.fill(self.settings.bg_color)
@@ -144,6 +147,7 @@ class AlienInvasion:
             self._reset_game()
             if self.stats.ships_left <= 0:
                 self.stats.game_active = False
+                pygame.mouse.set_visible(True)
         else:
             self.ship.update()
             self.ship.blitme()
