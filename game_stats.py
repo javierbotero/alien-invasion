@@ -7,4 +7,4 @@ class GameStats:
     def _reset_settings(self):
         """Sets up the settings"""
         self.ships_left = self.settings.ships_limit
-        self.game_active = True
+        self.game_active = False
