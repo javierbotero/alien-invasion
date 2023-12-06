@@ -20,10 +20,10 @@ class Ship:
     def update(self):
         """Updates position of ship"""
         if self.move_right and self.screen_rect.right > self.rect.right:
-            self.x += self.settings.speed_incrementor
+            self.x += self.settings.ship_speed
 
         if self.move_left and self.screen_rect.left < self.rect.left:
-            self.x -= self.settings.speed_incrementor
+            self.x -= self.settings.ship_speed
 
         self.rect.x = self.x
     

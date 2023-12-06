@@ -65,6 +65,7 @@ class AlienInvasion:
         self.aliens.empty()
         self.bullets.empty()
         self._create_fleet()
+        self.settings._initialize_dynamic_settings()
 
         # hides cursor
         pygame.mouse.set_visible(False)
@@ -132,6 +133,7 @@ class AlienInvasion:
         if not self.aliens:
             self.bullets.empty()
             self._create_fleet()
+            self.settings.increase_speed()
 
     def _create_fleet(self):
         """Creates the Alien's fleet"""
