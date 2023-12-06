@@ -20,15 +20,24 @@ class AlienInvasion:
                 self.settings.screen_width,
                 self.settings.screen_hight
             ))
-        self.settings.screen_width = self.screen.get_rect().width
-        self.settings.screen_hight = self.screen.get_rect().height
+        self.rect = self.screen.get_rect()
         pygame.display.set_caption("Javier's Alien Invasion")
         self.ship = Ship(self)
         self.stats = GameStats(self)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
         self._create_fleet()
-        self.play_button = Button(self, "Play")
+        self.play_button = Button(
+            self, "Play",
+            200, 50, (self.rect.centery - 100)
+            )
+        self.medium_button = Button(
+            self, "Medium",
+            200, 50, self.rect.centery
+            )
+        self.hard_button = Button(
+            self, "Hard",
+            200, 50, (self.rect.centery + 100))
 
     def run_game(self):
         """Runs the game"""
@@ -53,7 +62,20 @@ class AlienInvasion:
         """Respond to mouse clicks."""
         if (self.play_button.rect.collidepoint(position)
             and not self.stats.game_active):
-            self._start_game()
+            self._set_initial_speed(1, 1, 1)
+        elif (self.medium_button.rect.collidepoint(position)
+              and not self.stats.game_active):
+            self._set_initial_speed(1.5, 1.5, 1.5)
+        elif (self.hard_button.rect.collidepoint(position)
+              and not self.stats.game_active):
+            self._set_initial_speed(2, 2, 2)
+
+    def _set_initial_speed(self, alien, bullet, ship):
+        """Sets the initial speed."""
+        self.settings.initial_alien_speed = alien
+        self.settings.initial_bullet_speed = bullet
+        self.settings.initial_ship_speed = ship
+        self._start_game()
 
     def _start_game(self):
         """Starts the game"""
@@ -80,6 +102,8 @@ class AlienInvasion:
             self._update_bullets()
         else:
             self.play_button.draw_button()
+            self.medium_button.draw_button()
+            self.hard_button.draw_button()
 
         pygame.display.flip()
 
