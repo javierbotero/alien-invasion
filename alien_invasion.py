@@ -9,6 +9,7 @@ from bullet import Bullet
 from alien import Alien
 from game_stats import GameStats
 from button import Button
+from scoreboard import Scoreboard
 
 class AlienInvasion:
     """A class to represent the Alien Invasion"""
@@ -38,6 +39,7 @@ class AlienInvasion:
         self.hard_button = Button(
             self, "Hard",
             200, 50, (self.rect.centery + 100))
+        self.sb = Scoreboard(self)
 
     def run_game(self):
         """Runs the game"""
@@ -63,6 +65,8 @@ class AlienInvasion:
         if (self.play_button.rect.collidepoint(position)
             and not self.stats.game_active):
             self._set_initial_speed(1, 1, 1)
+            self.sb._prep_score()
+            self.sb._prep_level()
         elif (self.medium_button.rect.collidepoint(position)
               and not self.stats.game_active):
             self._set_initial_speed(1.5, 1.5, 1.5)
@@ -100,6 +104,7 @@ class AlienInvasion:
             self._update_aliens()
             self.aliens.draw(self.screen)
             self._update_bullets()
+            self.sb.blit_score_board()
         else:
             self.play_button.draw_button()
             self.medium_button.draw_button()
@@ -154,10 +159,20 @@ class AlienInvasion:
             self.bullets, self.aliens, True, True
             )
 
+        if collisions:
+            for aliens in collisions.values():
+                self.stats.score += int(self.settings.score_gain *
+                                        self.settings.score_incrementor)
+                self.sb._prep_score()
+
+            self.sb.check_scores()
+
         if not self.aliens:
             self.bullets.empty()
             self._create_fleet()
             self.settings.increase_speed()
+            self.stats.level += 1
+            self.sb._prep_level()
 
     def _create_fleet(self):
         """Creates the Alien's fleet"""

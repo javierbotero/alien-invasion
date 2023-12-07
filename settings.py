@@ -14,6 +14,8 @@ class Settings:
         self.initial_alien_speed = 1
         self.initial_bullet_speed = 1
         self.initial_ship_speed = 1
+        self.score_gain = 50
+        self.score_incrementor = 1.5
         # sets settings that will change
         self._initialize_dynamic_settings()
 
