@@ -51,7 +51,7 @@ class AlienInvasion:
         """Respond to keypresses and mouse events."""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                sys.exit()
+                self._close_game()
             elif event.type == pygame.KEYDOWN:
                 self._update_keydown(event)
             elif event.type == pygame.KEYUP:
@@ -122,7 +122,7 @@ class AlienInvasion:
         elif event.key == pygame.K_SPACE:
             self._fire_bullet()
         elif event.key == pygame.K_q:
-            sys.exit()
+            self._close_game()
         elif event.key == pygame.K_p:
             if not self.stats.game_active:
                 self._start_game()
@@ -245,6 +245,11 @@ class AlienInvasion:
         for alien in self.aliens.sprites():
             if alien.rect.bottom >= screen_rect.bottom:
                 return True
+
+    def _close_game(self):
+        """Saves high score to file and closes the game"""
+        self.stats.save_high_score()
+        sys.exit()
 
 if __name__ == '__main__':
     ai = AlienInvasion()
