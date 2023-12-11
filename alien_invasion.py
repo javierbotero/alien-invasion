@@ -65,14 +65,15 @@ class AlienInvasion:
         if (self.play_button.rect.collidepoint(position)
             and not self.stats.game_active):
             self._set_initial_speed(1, 1, 1)
-            self.sb._prep_score()
-            self.sb._prep_level()
+            self.sb.prep_items()
         elif (self.medium_button.rect.collidepoint(position)
               and not self.stats.game_active):
             self._set_initial_speed(1.5, 1.5, 1.5)
+            self.sb.prep_items()
         elif (self.hard_button.rect.collidepoint(position)
               and not self.stats.game_active):
             self._set_initial_speed(2, 2, 2)
+            self.sb.prep_items()
 
     def _set_initial_speed(self, alien, bullet, ship):
         """Sets the initial speed."""
@@ -207,6 +208,7 @@ class AlienInvasion:
         self.aliens.empty()
         self.stats.ships_left -= 1
         self._create_fleet()
+        self.sb._prep_ships_left()
         sleep(0.5)
 
     def _create_alien(self, index_x, index_y):
