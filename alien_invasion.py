@@ -17,6 +17,7 @@ class AlienInvasion:
     """A class to represent the Alien Invasion"""
     def __init__(self):
         pygame.init()
+        pygame.mixer.init()
         self.settings = Settings()
         self.screen = pygame.display.set_mode(
             (
@@ -43,6 +44,7 @@ class AlienInvasion:
             self, "Hard",
             200, 50, (self.rect.centery + 100))
         self.sb = Scoreboard(self)
+        self.fx_ship_shot = pygame.mixer.Sound("sounds/ship_shot.wav")
 
     def run_game(self):
         """Runs the game"""
@@ -145,6 +147,7 @@ class AlienInvasion:
         if len(self.bullets) < self.settings.bullets_allowed:
             bullet = Bullet(self)
             self.bullets.add(bullet)
+            self.fx_ship_shot.play()
 
     def _update_bullets(self):
         """Update position of bullets and get rid of old bullets.
