@@ -12,6 +12,7 @@ from game_stats import GameStats
 from button import Button
 from scoreboard import Scoreboard
 from energy import Energy
+from mixer import Mixer
 
 class AlienInvasion:
     """A class to represent the Alien Invasion"""
@@ -44,7 +45,8 @@ class AlienInvasion:
             self, "Hard",
             200, 50, (self.rect.centery + 100))
         self.sb = Scoreboard(self)
-        self.fx_ship_shot = pygame.mixer.Sound("sounds/ship_shot.wav")
+        self.mixer = Mixer()
+        self.mixer._play_music()
 
     def run_game(self):
         """Runs the game"""
@@ -103,6 +105,9 @@ class AlienInvasion:
         # hides cursor
         pygame.mouse.set_visible(False)
 
+        # start the game music
+        self.mixer._play_music()
+
     def _update_screen(self):
         """Update the screen per iteration."""
         self.screen.fill(self.settings.bg_color)
@@ -147,7 +152,7 @@ class AlienInvasion:
         if len(self.bullets) < self.settings.bullets_allowed:
             bullet = Bullet(self)
             self.bullets.add(bullet)
-            self.fx_ship_shot.play()
+            self.mixer.fx_ship_shot.play()
 
     def _update_bullets(self):
         """Update position of bullets and get rid of old bullets.
@@ -207,6 +212,7 @@ class AlienInvasion:
             if self.stats.ships_left <= 0:
                 self.stats.game_active = False
                 pygame.mouse.set_visible(True)
+                self.mixer._play_music()
         else:
             self.ship.update()
             self.ship.blitme()
@@ -272,6 +278,7 @@ class AlienInvasion:
             alien = self.aliens.sprites()[index]
             energy = Energy(self, alien)
             self.energies.add(energy)
+            self.mixer.fx_alien_shot.play()
 
     def _update_energy(self):
         """Updates energies position"""
