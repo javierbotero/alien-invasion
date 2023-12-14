@@ -1,5 +1,6 @@
 import sys
 from time import sleep
+import random
 
 import pygame
 
@@ -10,6 +11,7 @@ from alien import Alien
 from game_stats import GameStats
 from button import Button
 from scoreboard import Scoreboard
+from energy import Energy
 
 class AlienInvasion:
     """A class to represent the Alien Invasion"""
@@ -27,6 +29,7 @@ class AlienInvasion:
         self.stats = GameStats(self)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
+        self.energies = pygame.sprite.Group()
         self._create_fleet()
         self.play_button = Button(
             self, "Play",
@@ -64,22 +67,23 @@ class AlienInvasion:
         """Respond to mouse clicks."""
         if (self.play_button.rect.collidepoint(position)
             and not self.stats.game_active):
-            self._set_initial_speed(1, 1, 1)
+            self._set_initial_speed(1, 1, 1, 8)
             self.sb.prep_items()
         elif (self.medium_button.rect.collidepoint(position)
               and not self.stats.game_active):
-            self._set_initial_speed(1.5, 1.5, 1.5)
+            self._set_initial_speed(1.5, 1.5, 1.5, 6)
             self.sb.prep_items()
         elif (self.hard_button.rect.collidepoint(position)
               and not self.stats.game_active):
-            self._set_initial_speed(2, 2, 2)
+            self._set_initial_speed(2, 2, 2, 4)
             self.sb.prep_items()
 
-    def _set_initial_speed(self, alien, bullet, ship):
+    def _set_initial_speed(self, alien, bullet, ship, modulus):
         """Sets the initial speed."""
         self.settings.initial_alien_speed = alien
         self.settings.initial_bullet_speed = bullet
         self.settings.initial_ship_speed = ship
+        self.settings.initial_modulus_energies = modulus
         self._start_game()
 
     def _start_game(self):
@@ -105,6 +109,8 @@ class AlienInvasion:
             self._update_aliens()
             self.aliens.draw(self.screen)
             self._update_bullets()
+            self._create_energy()
+            self._update_energy()
             self.sb.blit_score_board()
         else:
             self.play_button.draw_button()
@@ -192,7 +198,8 @@ class AlienInvasion:
     def _update_ship(self):
         """Updates ship and checks collisions"""
         if (pygame.sprite.spritecollideany(self.ship, self.aliens)
-            or self._check_aliens_reach_bottom()):
+                or pygame.sprite.spritecollideany(self.ship, self.energies)
+                or self._check_aliens_reach_bottom()):
             self._reset_game()
             if self.stats.ships_left <= 0:
                 self.stats.game_active = False
@@ -206,6 +213,7 @@ class AlienInvasion:
         self.ship.center_ship()
         self.bullets.empty()
         self.aliens.empty()
+        self.energies.empty()
         self.stats.ships_left -= 1
         self._create_fleet()
         self.sb._prep_ships_left()
@@ -250,6 +258,21 @@ class AlienInvasion:
         """Saves high score to file and closes the game"""
         self.stats.save_high_score()
         sys.exit()
+
+    def _create_energy(self):
+        if (self.aliens and self.stats.game_active and
+                (len(self.energies.sprites()) <
+                int(self.settings.energies_allowed)) and
+                (len(self.aliens.sprites()) %
+                self.settings.modulus_energies == 0)):
+            index = random.randint(0, len(self.aliens.sprites()) - 1)
+            alien = self.aliens.sprites()[index]
+            energy = Energy(self, alien)
+            self.energies.add(energy)
+
+    def _update_energy(self):
+        """Updates energies position"""
+        self.energies.update()
 
 if __name__ == '__main__':
     ai = AlienInvasion()
